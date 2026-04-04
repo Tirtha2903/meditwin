@@ -1,0 +1,3 @@
+/presage/build/CMakeFiles/vitals_scanner.dir
+/presage/build/CMakeFiles/edit_cache.dir
+/presage/build/CMakeFiles/rebuild_cache.dir

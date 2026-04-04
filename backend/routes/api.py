@@ -67,3 +67,23 @@ def speak():
         return Response(response.content, mimetype='audio/mpeg')
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@api_bp.route('/superplane/trigger', methods=['POST'])
+def superplane_trigger():
+    data = request.get_json()
+    try:
+        # Forward event to SuperPlane webhook
+        response = req.post(
+            'https://app.superplane.com/api/v1/webhooks/meditwin',
+            headers={'Content-Type': 'application/json'},
+            json={
+                'event_type': data.get('event'),
+                'payload': data,
+                'source': 'MediTwin AI'
+            },
+            timeout=5
+        )
+        return jsonify({'status': 'triggered', 'superplane_status': response.status_code})
+    except Exception as e:
+        # Don't fail if SuperPlane is unreachable
+        return jsonify({'status': 'triggered_locally', 'note': str(e)})
