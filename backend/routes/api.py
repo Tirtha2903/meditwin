@@ -7,9 +7,9 @@ import time
 
 api_bp = Blueprint('api', __name__)
 
-GEMINI_KEY = 'AIzaSyCsXBhPCQlo7RmH6vxOUPVbMJJGCh1viQ0'
-ELEVENLABS_KEY = 'sk_08c0de3515ab66d6b6651ff161fb1a4ba2a2947134ef3e9b'
-VOICE_ID = 'Ig3E2CbjErTtg7LouDHB'
+GEMINI_KEY = 'AIzaSyCEatDlCKoi1vm7wuEqEvMVHSpX-U3oMu0'
+ELEVENLABS_KEY = 'sk_07f027c6f0f83f6c97a0e476a6dc690ab09b64b26ae3cd28'
+VOICE_ID = 'Uz2TDQJ717K7hIUdtxoV'
 REQUIRED = ['age','heart_rate','systolic_bp','diastolic_bp','bmi','cholesterol','glucose','smoking','diabetes','family_history']
 
 gemini_client = genai.Client(api_key=GEMINI_KEY)
@@ -44,7 +44,7 @@ def chat():
         try:
             prompt = f"{context}\n\nUser question: {message}\n\nAnswer in under 100 words. Be direct and helpful."
             response = gemini_client.models.generate_content(
-                model='gemini-2.0-flash',
+                model='gemini-1.5-flash',
                 contents=prompt
             )
             return jsonify({'reply': response.text})

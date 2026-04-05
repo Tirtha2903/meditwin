@@ -1,25 +1,212 @@
+import jsPDF from 'jspdf'
+
 export default function ResultCard({ result }) {
-  const { prediction, future_risk } = result;
-  const isHigh = prediction.risk_label === "HIGH";
+  const { prediction, future_risk, digital_twin, explanation } = result
+  const isHigh = prediction.risk_label === 'HIGH'
+
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+    const teal = [0, 197, 125]
+    const dark = [5, 11, 18]
+    const red = [255, 77, 109]
+    const w = doc.internal.pageSize.getWidth()
+
+    // Header background
+    doc.setFillColor(...dark)
+    doc.rect(0, 0, w, 40, 'F')
+
+    // Logo text
+    doc.setTextColor(...teal)
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('MediTwin AI', 14, 18)
+
+    doc.setTextColor(200, 220, 240)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Predictive Healthcare Digital Twin System', 14, 26)
+    doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, 33)
+
+    // Risk badge
+    doc.setFillColor(...(isHigh ? red : teal))
+    doc.roundedRect(w - 55, 8, 42, 14, 3, 3, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${prediction.risk_label} RISK`, w - 48, 17)
+
+    let y = 52
+
+    // Digital Twin section
+    doc.setTextColor(...dark)
+    doc.setFontSize(13)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Digital Twin Profile', 14, y)
+    y += 8
+
+    doc.setDrawColor(...teal)
+    doc.setLineWidth(0.5)
+    doc.line(14, y, w - 14, y)
+    y += 8
+
+    const twinData = [
+      ['Twin ID', digital_twin.twin_id],
+      ['Age', `${digital_twin.age} years (${digital_twin.age_group})`],
+      ['Heart Rate', `${digital_twin.heart_rate} bpm (${digital_twin.hr_status})`],
+      ['Blood Pressure', `${digital_twin.systolic_bp}/${digital_twin.diastolic_bp} mmHg (${digital_twin.bp_status})`],
+      ['BMI', `${digital_twin.bmi} (${digital_twin.bmi_status})`],
+      ['Health Score', `${digital_twin.health_score}/100`],
+    ]
+
+    doc.setFontSize(10)
+    twinData.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(90, 122, 144)
+      doc.text(label, 14, y)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...dark)
+      doc.text(value, 80, y)
+      y += 8
+    })
+
+    y += 6
+
+    // Prediction section
+    doc.setFontSize(13)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...dark)
+    doc.text('Risk Assessment', 14, y)
+    y += 8
+
+    doc.setDrawColor(...teal)
+    doc.line(14, y, w - 14, y)
+    y += 8
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(90, 122, 144)
+    doc.text('Risk Level', 14, y)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...(isHigh ? red : teal))
+    doc.text(prediction.risk_label, 80, y)
+    y += 8
+
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(90, 122, 144)
+    doc.text('Risk Probability', 14, y)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...dark)
+    doc.text(`${prediction.probability}%`, 80, y)
+    y += 8
+
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(90, 122, 144)
+    doc.text('Model Confidence', 14, y)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...dark)
+    doc.text(`${prediction.confidence}%`, 80, y)
+    y += 8
+
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(90, 122, 144)
+    doc.text('Top Risk Factors', 14, y)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...dark)
+    doc.text(explanation?.top_factors?.join(', ') || 'N/A', 80, y)
+    y += 14
+
+    // 7-day forecast
+    doc.setFontSize(13)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...dark)
+    doc.text('7-Day Risk Forecast', 14, y)
+    y += 8
+
+    doc.setDrawColor(...teal)
+    doc.line(14, y, w - 14, y)
+    y += 8
+
+    doc.setFontSize(9.5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(60, 60, 60)
+    const forecastLines = doc.splitTextToSize(
+      future_risk.replace(/[^\w\s.,!?-]/g, ''), w - 28
+    )
+    doc.text(forecastLines, 14, y)
+    y += forecastLines.length * 6 + 8
+
+    // Explanation
+    if (explanation?.summary) {
+      doc.setFontSize(13)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...dark)
+      doc.text('AI Explanation', 14, y)
+      y += 8
+
+      doc.setDrawColor(...teal)
+      doc.line(14, y, w - 14, y)
+      y += 8
+
+      doc.setFontSize(9.5)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(60, 60, 60)
+      const explainLines = doc.splitTextToSize(explanation.summary, w - 28)
+      doc.text(explainLines, 14, y)
+      y += explainLines.length * 6 + 8
+    }
+
+    // Disclaimer
+    doc.setFillColor(240, 240, 240)
+    doc.rect(14, y, w - 28, 16, 'F')
+    doc.setFontSize(8)
+    doc.setTextColor(100, 100, 100)
+    doc.text('DISCLAIMER: This report is generated by an AI model for informational purposes only.', 18, y + 6)
+    doc.text('It is not a medical diagnosis. Always consult a qualified healthcare professional.', 18, y + 12)
+
+    doc.save(`MediTwin-Report-${digital_twin.twin_id}.pdf`)
+  }
+
   return (
-    <div className={`result-card ${isHigh ? "risk-high" : "risk-low"}`}>
-      <div className="risk-badge"><span className="risk-dot"/><span>{isHigh ? "HIGH RISK" : "LOW RISK"}</span></div>
+    <div className={`result-card ${isHigh ? 'risk-high' : 'risk-low'}`}>
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20}}>
+        <div className="risk-badge">
+          <span className="risk-dot"/>
+          <span className="risk-text">{isHigh ? 'HIGH RISK' : 'LOW RISK'}</span>
+        </div>
+        <button className="voice-btn" onClick={downloadPDF} style={{fontSize:'.72rem'}}>
+          ⬇ Download PDF
+        </button>
+      </div>
+
       <div className="prob-section">
         <div className="prob-circle">
           <svg viewBox="0 0 100 100" className="prob-svg">
             <circle cx="50" cy="50" r="40" className="prob-track"/>
             <circle cx="50" cy="50" r="40" className="prob-arc"
-              strokeDasharray={`${prediction.probability*2.51} 251`}
-              style={{stroke: isHigh?"#ff4d6d":"#00f5a0"}}/>
+              strokeDasharray={`${prediction.probability * 2.51} 251`}
+              style={{stroke: isHigh ? '#ff4d6d' : '#00f5a0'}}/>
           </svg>
-          <div className="prob-label"><span className="prob-num">{prediction.probability}%</span><span className="prob-sub">risk</span></div>
+          <div className="prob-label">
+            <span className="prob-num">{prediction.probability}%</span>
+            <span className="prob-sub">risk</span>
+          </div>
         </div>
-        <div className="confidence-row">Confidence: <strong>{prediction.confidence}%</strong></div>
+        <div className="confidence-row">
+          Model confidence: <strong>{prediction.confidence}%</strong>
+        </div>
       </div>
+
+      {explanation && (
+        <div className="forecast-box" style={{marginBottom:12}}>
+          <div className="forecast-title">Why this risk level?</div>
+          <p className="forecast-msg" style={{marginTop:6}}>{explanation.summary}</p>
+        </div>
+      )}
+
       <div className="forecast-box">
         <div className="forecast-title">7-Day Risk Forecast</div>
         <p className="forecast-msg">{future_risk}</p>
       </div>
     </div>
-  );
+  )
 }

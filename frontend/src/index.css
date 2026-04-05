@@ -1020,3 +1020,127 @@ body::before {
   .hero-stat-row { gap: 20px; }
   .hero-stat-num { font-size: 1.4rem; }
 }
+
+/* ─── Timeline ────────────────────────────────────────────────── */
+.twin-timeline-nodes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.timeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+}
+
+.timeline-node-label {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  color: var(--text-dim);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.timeline-node-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.timeline-node-risk {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.timeline-node-sub {
+  font-size: .6rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.timeline-node-score {
+  font-family: var(--font-mono);
+  font-size: .65rem;
+  color: var(--text-dim);
+}
+
+.timeline-arrow {
+  position: absolute;
+  right: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--border);
+  font-size: 1.2rem;
+  z-index: 1;
+}
+
+/* ─── Education ───────────────────────────────────────────────── */
+.edu-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+
+.edu-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.edu-vital-name {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-right: 10px;
+}
+
+.edu-vital-value {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.edu-bar-track {
+  height: 6px;
+  background: var(--surface);
+  border-radius: 99px;
+  position: relative;
+  overflow: hidden;
+}
+
+.edu-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .8s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.edu-bar-normal {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0,245,160,.15);
+  border-left: 1px solid rgba(0,245,160,.4);
+  border-right: 1px solid rgba(0,245,160,.4);
+  z-index: 1;
+}
